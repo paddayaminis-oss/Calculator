@@ -1,0 +1,62 @@
+import ipywidgets as widgets
+from IPython.display import display
+
+# Create display screen
+display_box = widgets.Text(
+    value='',
+    placeholder='0',
+    disabled=True,
+    layout=widgets.Layout(width='264px', height='40px')
+)
+
+# Button grid layout
+button_layout = widgets.Layout(width='60px', height='60px')
+buttons = [
+    ['7', '8', '9', '/'],
+    ['4', '5', '6', '*'],
+    ['1', '2', '3', '-'],
+    ['C', '0', '=', '+']
+]
+
+current_expr = ""
+
+def on_button_clicked(b):
+    global current_expr
+    text = b.description
+    
+    if text == 'C':
+        current_expr = ""
+        display_box.value = ""
+    elif text == '=':
+        try:
+            result = str(eval(current_expr))
+            display_box.value = result
+            current_expr = result
+        except Exception:
+            display_box.value = "Error"
+            current_expr = ""
+    else:
+        current_expr += text
+        display_box.value = current_expr
+
+# Generate button grid
+grid_rows = []
+for row in buttons:
+    row_buttons = []
+    for char in row:
+        btn = widgets.Button(
+            description=char, 
+            layout=button_layout,
+            style={'button_color': '#f0f0f0', 'font_weight': 'bold'}
+        )
+        btn.on_click(on_button_clicked)
+        row_buttons.append(btn)
+    grid_rows.append(widgets.HBox(row_buttons))
+
+# Assemble UI
+calculator_ui = widgets.VBox([
+    display_box, 
+    widgets.VBox(grid_rows, layout=widgets.Layout(gap='5px'))
+], layout=widgets.Layout(width='280px', padding='10px', border='2px solid #ccc', border_radius='8px'))
+
+display(calculator_ui)
